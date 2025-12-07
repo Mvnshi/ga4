@@ -269,25 +269,61 @@ report = st.session_state.report
 metadata = report.get('metadata', {})
 ga4 = report.get('ga4', {})
 gsc = report.get('gsc', {})
+pagespeed = report.get('pagespeed', {})
+hotjar = report.get('hotjar', {})
+google_ads = report.get('google_ads', {})
 comparison = report.get('comparison', {})
 insights = report.get('insights', {})
 
 current_period = metadata.get('current_period', {}).get('label', '')
 previous_period = metadata.get('previous_period', {}).get('label', '')
 
-st.markdown(f"**Comparing:** {current_period} vs {previous_period}")
+# Show active integrations
+integrations = metadata.get('integrations', {})
+active_integrations = [k for k, v in integrations.items() if v]
+if active_integrations:
+    st.markdown(f"**Comparing:** {current_period} vs {previous_period} | **Active integrations:** {', '.join(active_integrations)}")
+else:
+    st.markdown(f"**Comparing:** {current_period} vs {previous_period}")
 
 # =============================================================================
 # TAB LAYOUT
 # =============================================================================
 
-tab_overview, tab_search, tab_content, tab_audience, tab_insights = st.tabs([
+# Build tabs dynamically based on available data
+tab_names = [
     "📊 Traffic Overview",
     "🔍 Search Performance", 
     "📄 Content",
     "👥 Audience",
-    "💡 Insights"
-])
+]
+
+# Add optional tabs
+if pagespeed.get('available'):
+    tab_names.append("⚡ PageSpeed")
+if hotjar.get('available'):
+    tab_names.append("🔥 Hotjar")
+if google_ads.get('available'):
+    tab_names.append("💰 Google Ads")
+
+tab_names.append("💡 Insights")
+
+tabs = st.tabs(tab_names)
+tab_idx = 0
+
+tab_overview = tabs[tab_idx]; tab_idx += 1
+tab_search = tabs[tab_idx]; tab_idx += 1
+tab_content = tabs[tab_idx]; tab_idx += 1
+tab_audience = tabs[tab_idx]; tab_idx += 1
+
+if pagespeed.get('available'):
+    tab_pagespeed = tabs[tab_idx]; tab_idx += 1
+if hotjar.get('available'):
+    tab_hotjar = tabs[tab_idx]; tab_idx += 1
+if google_ads.get('available'):
+    tab_google_ads = tabs[tab_idx]; tab_idx += 1
+
+tab_insights = tabs[tab_idx]
 
 # -----------------------------------------------------------------------------
 # TRAFFIC OVERVIEW TAB
@@ -622,6 +658,206 @@ with tab_audience:
                 f"{ret_data.get('users', 0):,}",
                 f"{ret_data.get('pct_of_total', 0):.1f}% of total"
             )
+
+
+# -----------------------------------------------------------------------------
+# PAGESPEED TAB (if available)
+# -----------------------------------------------------------------------------
+if pagespeed.get('available'):
+    with tab_pagespeed:
+        st.markdown("### ⚡ PageSpeed Insights")
+        st.caption("Site performance analysis from Google PageSpeed Insights")
+        
+        summary = pagespeed.get('summary', {})
+        mobile = pagespeed.get('mobile', {})
+        desktop = pagespeed.get('desktop', {})
+        
+        # Score cards
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            mobile_score = summary.get('mobile_score', 0)
+            mobile_status = summary.get('mobile_status', 'unknown')
+            color = "normal" if mobile_status == "good" else "inverse" if mobile_status == "poor" else "off"
+            st.metric(
+                "📱 Mobile Performance",
+                f"{mobile_score}/100",
+                delta=mobile_status.replace('_', ' ').title(),
+                delta_color=color
+            )
+        
+        with col2:
+            desktop_score = summary.get('desktop_score', 0)
+            desktop_status = summary.get('desktop_status', 'unknown')
+            color = "normal" if desktop_status == "good" else "inverse" if desktop_status == "poor" else "off"
+            st.metric(
+                "🖥️ Desktop Performance",
+                f"{desktop_score}/100",
+                delta=desktop_status.replace('_', ' ').title(),
+                delta_color=color
+            )
+        
+        st.markdown("---")
+        
+        # Core Web Vitals
+        st.markdown("### 📊 Core Web Vitals (Mobile)")
+        
+        if mobile:
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                lcp = mobile.get('lcp', 0)
+                lcp_status = "Good" if lcp <= 2.5 else "Needs Improvement" if lcp <= 4 else "Poor"
+                st.metric("LCP", f"{lcp:.2f}s", delta=lcp_status, 
+                         delta_color="normal" if lcp <= 2.5 else "inverse")
+                st.caption("Largest Contentful Paint")
+            
+            with col2:
+                cls = mobile.get('cls', 0)
+                cls_status = "Good" if cls <= 0.1 else "Needs Improvement" if cls <= 0.25 else "Poor"
+                st.metric("CLS", f"{cls:.3f}", delta=cls_status,
+                         delta_color="normal" if cls <= 0.1 else "inverse")
+                st.caption("Cumulative Layout Shift")
+            
+            with col3:
+                tbt = mobile.get('tbt', 0)
+                tbt_status = "Good" if tbt <= 200 else "Needs Improvement" if tbt <= 600 else "Poor"
+                st.metric("TBT", f"{tbt:.0f}ms", delta=tbt_status,
+                         delta_color="normal" if tbt <= 200 else "inverse")
+                st.caption("Total Blocking Time")
+            
+            with col4:
+                tti = mobile.get('tti', 0)
+                st.metric("TTI", f"{tti:.2f}s")
+                st.caption("Time to Interactive")
+        
+        # Opportunities
+        st.markdown("---")
+        st.markdown("### 🎯 Improvement Opportunities")
+        
+        opportunities = mobile.get('opportunities', []) if mobile else []
+        if opportunities:
+            for opp in opportunities[:5]:
+                savings = opp.get('savings_ms', 0)
+                if savings > 0:
+                    st.markdown(f"**{opp.get('title', '')}** - Could save {savings/1000:.1f}s")
+        else:
+            st.info("No major improvement opportunities identified.")
+
+
+# -----------------------------------------------------------------------------
+# HOTJAR TAB (if available)
+# -----------------------------------------------------------------------------
+if hotjar.get('available'):
+    with tab_hotjar:
+        st.markdown("### 🔥 Hotjar User Feedback")
+        st.caption("User sentiment and feedback from Hotjar")
+        
+        hj_summary = hotjar.get('summary', {})
+        feedback = hotjar.get('feedback', {})
+        surveys = hotjar.get('surveys', {})
+        
+        # Overview metrics
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric(
+                "Total Feedback",
+                hj_summary.get('total_feedback', 0)
+            )
+        
+        with col2:
+            st.metric(
+                "Survey Responses",
+                hj_summary.get('total_survey_responses', 0)
+            )
+        
+        with col3:
+            sentiment = hj_summary.get('sentiment_score', 0)
+            st.metric(
+                "Sentiment Score",
+                f"{sentiment:.0f}",
+                delta="Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral",
+                delta_color="normal" if sentiment > 0 else "inverse" if sentiment < 0 else "off"
+            )
+        
+        st.markdown("---")
+        
+        # Sentiment breakdown
+        st.markdown("### 😊 Sentiment Breakdown")
+        
+        sentiment_data = feedback.get('sentiment_pct', {})
+        if sentiment_data:
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("😊 Happy", f"{sentiment_data.get('happy', 0):.1f}%")
+            with col2:
+                st.metric("😐 Neutral", f"{sentiment_data.get('neutral', 0):.1f}%")
+            with col3:
+                st.metric("😞 Sad", f"{sentiment_data.get('sad', 0):.1f}%")
+        
+        # Recent feedback
+        st.markdown("---")
+        st.markdown("### 💬 Recent Feedback")
+        
+        recent = feedback.get('recent_feedback', [])
+        if recent:
+            for item in recent[:5]:
+                emoji = "😊" if item.get('emotion') == 'happy' else "😞" if item.get('emotion') == 'sad' else "😐"
+                st.markdown(f"{emoji} *\"{item.get('message', '')}\"*")
+                st.caption(f"Page: {item.get('page', 'N/A')}")
+        else:
+            st.info("No recent feedback available.")
+
+
+# -----------------------------------------------------------------------------
+# GOOGLE ADS TAB (if available)
+# -----------------------------------------------------------------------------
+if google_ads.get('available'):
+    with tab_google_ads:
+        st.markdown("### 💰 Google Ads Performance")
+        
+        source = google_ads.get('source', 'unknown')
+        if source == 'ga4':
+            st.caption("Data sourced from GA4 (linked Google Ads account)")
+        else:
+            st.caption("Data from Google Ads API")
+        
+        ads_summary = google_ads.get('summary', {})
+        
+        # Overview metrics
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Sessions", f"{ads_summary.get('total_sessions', 0):,}")
+        
+        with col2:
+            st.metric("Users", f"{ads_summary.get('total_users', 0):,}")
+        
+        with col3:
+            bounce = ads_summary.get('bounce_rate', 0)
+            st.metric("Bounce Rate", f"{bounce:.1f}%")
+        
+        with col4:
+            st.metric("Campaigns", ads_summary.get('campaign_count', 0))
+        
+        st.markdown("---")
+        
+        # Campaign breakdown
+        st.markdown("### 📊 Campaign Performance")
+        
+        campaigns = google_ads.get('performance', {}).get('campaigns', [])
+        if campaigns:
+            df_campaigns = pd.DataFrame(campaigns)
+            st.dataframe(df_campaigns, hide_index=True, use_container_width=True)
+        else:
+            st.info("No campaign data available.")
+        
+        # Ad Grants note for nonprofits
+        st.markdown("---")
+        st.info("💡 **Nonprofit Tip:** If you have Google Ad Grants ($10,000/month free ads), "
+                "make sure you're utilizing your full budget!")
 
 
 # -----------------------------------------------------------------------------

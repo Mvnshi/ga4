@@ -1,33 +1,56 @@
 # Example Client Configuration
-# ============================
-# Copy this file and rename it for each client (e.g., bee_conservancy.yaml)
+# =============================
+# Copy this file and rename it for each client (e.g., my_nonprofit.yaml)
 
-# Required Settings
+# =============================================================================
+# REQUIRED SETTINGS
+# =============================================================================
 name: "example_client"
 display_name: "Example Nonprofit Organization"
 ga4_property_id: "123456789"  # Find in GA4 Admin → Property Settings
 gsc_site_url: "https://example.org/"  # or "sc-domain:example.org"
 credentials_file: "example_client_credentials.json"
 
-# Branding (for reports and dashboard)
-primary_color: "#F4C430"   # Your brand's primary color
-secondary_color: "#2D5016" # Your brand's secondary color
+# =============================================================================
+# BRANDING
+# =============================================================================
+primary_color: "#2D5016"   # Primary brand color
+secondary_color: "#F4C430" # Accent color
 logo_path: null  # Optional: path to logo image
-
-# Timezone for date handling
 timezone: "America/New_York"
 
-# Homepage detection (pages to consider as "homepage")
+# =============================================================================
+# REPORT CUSTOMIZATION  
+# =============================================================================
 homepage_paths:
   - "/"
   - "/home"
-  - "/index"
 
-# Paths to exclude from analysis
 exclude_paths:
   - "/admin"
   - "/wp-admin"
   - "/login"
-  - "/cart"
-  - "/checkout"
 
+# =============================================================================
+# OPTIONAL INTEGRATIONS
+# =============================================================================
+# All integrations are optional! The core GA4 + Search Console reports
+# work without any of these. Enable what you have access to.
+
+integrations:
+  # PageSpeed Insights - FREE, no setup needed!
+  pagespeed_enabled: true
+  pagespeed_api_key: null
+  pagespeed_analyze_pages:
+    - "/"
+  
+  # Hotjar - requires subscription and API token
+  hotjar_enabled: false
+  hotjar_site_id: null
+  hotjar_api_token: null
+  
+  # Google Ads - can use GA4 fallback even without full API setup
+  google_ads_enabled: false
+  google_ads_customer_id: null
+  google_ads_developer_token: null
+  google_ads_use_ga4_fallback: true

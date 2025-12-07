@@ -1,29 +1,32 @@
 # The Bee Conservancy Configuration
 # ==================================
-# Example configuration for The Bee Conservancy nonprofit
+# Full configuration with optional integrations
 
-# Required Settings
+# =============================================================================
+# REQUIRED SETTINGS
+# =============================================================================
 name: "bee_conservancy"
 display_name: "The Bee Conservancy"
 ga4_property_id: "YOUR_GA4_PROPERTY_ID"  # Find in GA4 Admin → Property Settings
 gsc_site_url: "https://thebeeconservancy.org/"  # or "sc-domain:thebeeconservancy.org"
 credentials_file: "bee_conservancy_credentials.json"
 
-# Branding (for reports and dashboard)
+# =============================================================================
+# BRANDING
+# =============================================================================
 primary_color: "#F4C430"   # Honey gold - bee theme!
 secondary_color: "#2D5016" # Forest green
 logo_path: null  # Optional: path to logo image
-
-# Timezone for date handling
 timezone: "America/New_York"
 
-# Homepage detection (pages to consider as "homepage")
+# =============================================================================
+# REPORT CUSTOMIZATION
+# =============================================================================
 homepage_paths:
   - "/"
   - "/home"
   - "/index"
 
-# Paths to exclude from analysis (admin pages, etc.)
 exclude_paths:
   - "/admin"
   - "/wp-admin"
@@ -32,3 +35,39 @@ exclude_paths:
   - "/checkout"
   - "/my-account"
 
+# =============================================================================
+# OPTIONAL INTEGRATIONS
+# =============================================================================
+# These are all optional - the tool works fine without them!
+# Just enable and configure the ones you have access to.
+
+integrations:
+  # ---------------------------------------------------------------------------
+  # PAGESPEED INSIGHTS (Free - Highly Recommended)
+  # ---------------------------------------------------------------------------
+  # No authentication needed! Just enable it.
+  # Optional API key gives higher rate limits.
+  pagespeed_enabled: true
+  pagespeed_api_key: null  # Optional: Google Cloud API key
+  pagespeed_analyze_pages:
+    - "/"           # Homepage
+    - "/donate"     # Donation page (important!)
+    - "/about"      # About page
+  
+  # ---------------------------------------------------------------------------
+  # HOTJAR (Requires Subscription)
+  # ---------------------------------------------------------------------------
+  # Get these from: Hotjar Dashboard → Integrations → API
+  hotjar_enabled: false
+  hotjar_site_id: null       # Your Hotjar Site ID
+  hotjar_api_token: null     # Personal Access Token from Hotjar
+  
+  # ---------------------------------------------------------------------------
+  # GOOGLE ADS / AD GRANTS
+  # ---------------------------------------------------------------------------
+  # For nonprofits using Google Ad Grants ($10K/month free ads)
+  # Even without full API setup, can pull Ads data from GA4 if linked
+  google_ads_enabled: false
+  google_ads_customer_id: null      # Google Ads Customer ID (without dashes)
+  google_ads_developer_token: null  # From Google Ads API Center
+  google_ads_use_ga4_fallback: true # Try to get Ads data from GA4 (recommended!)

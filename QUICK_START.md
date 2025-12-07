@@ -128,6 +128,31 @@ python main.py generate Q4 2024 -c bee_conservancy --export powerpoint
 python main.py clear-cache
 ```
 
+## Optional Integrations
+
+The tool supports these optional integrations (all work without them!):
+
+### PageSpeed Insights (Free - Enabled by Default)
+No setup needed! Just generates site performance data automatically.
+
+### Hotjar (If you have a subscription)
+Add to your client YAML:
+```yaml
+integrations:
+  hotjar_enabled: true
+  hotjar_site_id: "YOUR_SITE_ID"
+  hotjar_api_token: "YOUR_API_TOKEN"
+```
+
+### Google Ads (For nonprofits with Ad Grants)
+Even without full API setup, can pull Ads data from GA4 if accounts are linked:
+```yaml
+integrations:
+  google_ads_use_ga4_fallback: true  # This is enabled by default!
+```
+
+---
+
 ## Troubleshooting
 
 **"Permission denied" errors:**
@@ -140,4 +165,10 @@ python main.py clear-cache
 **"Module not found" errors:**
 - Make sure virtual environment is activated: `.\venv\Scripts\activate`
 - Reinstall: `pip install -r requirements.txt`
+
+**"Hotjar not configured" warning:**
+- This is fine! Hotjar is optional. The report still generates without it.
+
+**"PageSpeed failed" warning:**
+- Usually a network issue. Report still generates with other data.
 
