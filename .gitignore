@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials - NEVER commit these!
+credentials/*.json
+*.json
+!package.json
+!tsconfig.json
+
+# Cache
+.cache/
+*.cache
+
+# Output files (regenerated)
+output/*.xlsx
+output/*.pptx
+output/*.json
+output/*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+

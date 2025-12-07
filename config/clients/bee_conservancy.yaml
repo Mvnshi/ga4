@@ -1,0 +1,34 @@
+# The Bee Conservancy Configuration
+# ==================================
+# Example configuration for The Bee Conservancy nonprofit
+
+# Required Settings
+name: "bee_conservancy"
+display_name: "The Bee Conservancy"
+ga4_property_id: "YOUR_GA4_PROPERTY_ID"  # Find in GA4 Admin → Property Settings
+gsc_site_url: "https://thebeeconservancy.org/"  # or "sc-domain:thebeeconservancy.org"
+credentials_file: "bee_conservancy_credentials.json"
+
+# Branding (for reports and dashboard)
+primary_color: "#F4C430"   # Honey gold - bee theme!
+secondary_color: "#2D5016" # Forest green
+logo_path: null  # Optional: path to logo image
+
+# Timezone for date handling
+timezone: "America/New_York"
+
+# Homepage detection (pages to consider as "homepage")
+homepage_paths:
+  - "/"
+  - "/home"
+  - "/index"
+
+# Paths to exclude from analysis (admin pages, etc.)
+exclude_paths:
+  - "/admin"
+  - "/wp-admin"
+  - "/login"
+  - "/cart"
+  - "/checkout"
+  - "/my-account"
+

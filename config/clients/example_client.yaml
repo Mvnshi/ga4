@@ -1,0 +1,33 @@
+# Example Client Configuration
+# ============================
+# Copy this file and rename it for each client (e.g., bee_conservancy.yaml)
+
+# Required Settings
+name: "example_client"
+display_name: "Example Nonprofit Organization"
+ga4_property_id: "123456789"  # Find in GA4 Admin → Property Settings
+gsc_site_url: "https://example.org/"  # or "sc-domain:example.org"
+credentials_file: "example_client_credentials.json"
+
+# Branding (for reports and dashboard)
+primary_color: "#F4C430"   # Your brand's primary color
+secondary_color: "#2D5016" # Your brand's secondary color
+logo_path: null  # Optional: path to logo image
+
+# Timezone for date handling
+timezone: "America/New_York"
+
+# Homepage detection (pages to consider as "homepage")
+homepage_paths:
+  - "/"
+  - "/home"
+  - "/index"
+
+# Paths to exclude from analysis
+exclude_paths:
+  - "/admin"
+  - "/wp-admin"
+  - "/login"
+  - "/cart"
+  - "/checkout"
+
