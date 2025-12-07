@@ -436,7 +436,11 @@ class ReportGenerator:
         
         try:
             data = self.pagespeed.get_performance_overview()
-            data["available"] = True
+            # Only mark as available if we actually got some data
+            has_data = data.get("mobile") is not None or data.get("desktop") is not None
+            data["available"] = has_data
+            if not has_data:
+                data["reason"] = "PageSpeed analysis returned no data"
             return data
         except Exception as e:
             self.errors.append(f"PageSpeed fetch failed: {str(e)}")

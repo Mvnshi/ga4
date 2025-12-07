@@ -672,30 +672,40 @@ if pagespeed.get('available'):
         mobile = pagespeed.get('mobile', {})
         desktop = pagespeed.get('desktop', {})
         
-        # Score cards
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            mobile_score = summary.get('mobile_score', 0)
-            mobile_status = summary.get('mobile_status', 'unknown')
-            color = "normal" if mobile_status == "good" else "inverse" if mobile_status == "poor" else "off"
-            st.metric(
-                "📱 Mobile Performance",
-                f"{mobile_score}/100",
-                delta=mobile_status.replace('_', ' ').title(),
-                delta_color=color
-            )
-        
-        with col2:
-            desktop_score = summary.get('desktop_score', 0)
-            desktop_status = summary.get('desktop_status', 'unknown')
-            color = "normal" if desktop_status == "good" else "inverse" if desktop_status == "poor" else "off"
-            st.metric(
-                "🖥️ Desktop Performance",
-                f"{desktop_score}/100",
-                delta=desktop_status.replace('_', ' ').title(),
-                delta_color=color
-            )
+        # Check if we have any data to show
+        if not summary and not mobile and not desktop:
+            st.warning("PageSpeed analysis completed but returned no data. Try again later.")
+        else:
+            # Score cards - only show metrics we have
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if 'mobile_score' in summary or mobile:
+                    mobile_score = summary.get('mobile_score') or mobile.get('score', 0)
+                    mobile_status = summary.get('mobile_status', 'unknown')
+                    color = "normal" if mobile_status == "good" else "inverse" if mobile_status == "poor" else "off"
+                    st.metric(
+                        "📱 Mobile Performance",
+                        f"{mobile_score}/100",
+                        delta=mobile_status.replace('_', ' ').title() if mobile_status != 'unknown' else None,
+                        delta_color=color
+                    )
+                else:
+                    st.info("📱 Mobile analysis unavailable")
+            
+            with col2:
+                if 'desktop_score' in summary or desktop:
+                    desktop_score = summary.get('desktop_score') or desktop.get('score', 0)
+                    desktop_status = summary.get('desktop_status', 'unknown')
+                    color = "normal" if desktop_status == "good" else "inverse" if desktop_status == "poor" else "off"
+                    st.metric(
+                        "🖥️ Desktop Performance",
+                        f"{desktop_score}/100",
+                        delta=desktop_status.replace('_', ' ').title() if desktop_status != 'unknown' else None,
+                        delta_color=color
+                    )
+                else:
+                    st.info("🖥️ Desktop analysis unavailable")
         
         st.markdown("---")
         

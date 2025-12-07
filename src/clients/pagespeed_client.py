@@ -272,17 +272,29 @@ class PageSpeedClient:
                 "opportunities": desktop.opportunities,
             }
         
-        # Summary with status indicators
-        if mobile and desktop:
-            result["summary"] = {
-                "mobile_score": mobile.performance_score,
-                "desktop_score": desktop.performance_score,
-                "mobile_status": self._score_status(mobile.performance_score),
-                "desktop_status": self._score_status(desktop.performance_score),
-                "lcp_status": self._lcp_status(mobile.metrics.lcp),
-                "cls_status": self._cls_status(mobile.metrics.cls),
-                "top_opportunity": mobile.opportunities[0]["title"] if mobile.opportunities else None,
-            }
+        # Summary with status indicators - works with partial data
+        if mobile or desktop:
+            summary = {}
+            
+            if mobile:
+                summary["mobile_score"] = mobile.performance_score
+                summary["mobile_status"] = self._score_status(mobile.performance_score)
+                summary["lcp_status"] = self._lcp_status(mobile.metrics.lcp)
+                summary["cls_status"] = self._cls_status(mobile.metrics.cls)
+                summary["top_opportunity"] = mobile.opportunities[0]["title"] if mobile.opportunities else None
+            
+            if desktop:
+                summary["desktop_score"] = desktop.performance_score
+                summary["desktop_status"] = self._score_status(desktop.performance_score)
+                # If mobile didn't provide these, use desktop values
+                if "lcp_status" not in summary:
+                    summary["lcp_status"] = self._lcp_status(desktop.metrics.lcp)
+                if "cls_status" not in summary:
+                    summary["cls_status"] = self._cls_status(desktop.metrics.cls)
+                if "top_opportunity" not in summary:
+                    summary["top_opportunity"] = desktop.opportunities[0]["title"] if desktop.opportunities else None
+            
+            result["summary"] = summary
         
         return result
     
